@@ -179,13 +179,12 @@ install_depend() {
     which apt-get >/dev/null 2>&1
     [ $? -eq 0 ] && {
         apt-get update
-        apt-get upgrade -y
         apt-get install -y build-essential
         apt-get install -y curl git jq nano pwgen python
     }
     which yum >/dev/null 2>&1
     [ $? -eq 0 ] && {
-        yum update -y
+        yum makecache
         yum install -y curl git jq nano pwgen python
         yum groupinstall -y "Development Tools"
     }
