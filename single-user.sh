@@ -176,17 +176,23 @@ install_shadowsocksr() {
 # 安装依赖
 install_depend() {
     echo -e "\033[31m 开始安装所需依赖软件包... \033[0m"
-    which apt-get >/dev/null 2>&1
+    which apt-get >/dev/null 2>&1 # Debian/Ubuntu
     [ $? -eq 0 ] && {
         apt-get update
         apt-get install -y build-essential
         apt-get install -y curl git jq nano pwgen python
     }
-    which yum >/dev/null 2>&1
+    which yum >/dev/null 2>&1 # CentOS
     [ $? -eq 0 ] && {
         yum makecache
-        yum install -y curl git jq nano pwgen python
         yum groupinstall -y "Development Tools"
+        yum install -y curl git jq nano pwgen python
+    }
+    which zypper >/dev/null 2>&1 # openSUSE
+    [ $? -eq 0 ] && {
+        zypper ref
+        zypper install -y gcc
+        zypper install -y curl git jq nano pwgen python
     }
 }
 

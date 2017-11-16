@@ -11,7 +11,7 @@
 而脚本自身有以下特性：  
 * 命令式和交互式界面随意选择
 * 方便的二次开发
-* 多系统支持 目前支持：CentOS、Debian/Ubuntu 计划支持：openSUSE
+* 多系统支持 目前支持：CentOS、Debian/Ubuntu、openSUSE
 
 如何使用？
 ---
@@ -25,7 +25,7 @@ wget https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/
 chmod +x ssr-manage.sh
 ./ssr-manage.sh
 ```
-#### Debian/Ubuntu :  
+#### Debian/Ubuntu :
 ```
 sudo apt-get update
 sudo apt-get install wget
@@ -33,6 +33,15 @@ wget https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/
 chmod +x ssr-manage.sh
 ./ssr-manage.sh
 ```
+#### openSUSE :
+```
+sudo zypper ref
+sudo zypper install wget
+wget https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/single-user.sh -O ssr-manage.sh
+chmod +x ssr-manage.sh
+./ssr-manage.sh
+```
+如果是其他 Linux 发行版 (如: ArchLinux)，确保系统已安装 `curl gcc git jq nano pwgen python` 软件包，也可以使用此脚本。
 
 选择 `安装/更新 ShadowsocksR`
 
