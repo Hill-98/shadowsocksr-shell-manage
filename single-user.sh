@@ -4,7 +4,9 @@
 main() {
     help() {
         echo \
-"用法: `basename $0` <command>
+"ShadowsocksR Server 管理脚本 (单用户)
+
+用法: `basename $0` <command>
 例如: `basename $0` help
 
 命令列表:
@@ -21,12 +23,14 @@ main() {
     update      检查新版本并更新
 
 未知命令将切换至交互式界面
+
+version:$ver
 "
     exit
     }
     [ $1 = "help" ] && help
     local function_text=("install" "upgrade" "uninstall" "start" "restart" "stop" "viewlog" "viewinfo" "editconfig" "update")
-    local function=("install_shadowsocksr" "install_shadowsocksr" "uninstall_shadowsocksr" "start_shadowsocksr" "start_shadowsocksr" "stop_shadowsocksr" "viewlog_shadowsocksr" "viewinfo_shadowsocksr" "set_config_customize" "echo 检查新版本并更新")
+    local function=("install_shadowsocksr" "install_shadowsocksr" "uninstall_shadowsocksr" "start_shadowsocksr" "start_shadowsocksr" "stop_shadowsocksr" "viewlog_shadowsocksr" "viewinfo_shadowsocksr" "set_config_shadowsocksr_customize" "update")
     for ((i=0;i<${#function_text[@]};i++)); do
         if [ "$1" = "${function_text[i]}" ]; then
             local _function=${function[i]}
@@ -48,8 +52,8 @@ main() {
 main_i() {
     clear
     local function_text=("安装/更新 ShadowsocksR" "卸载 ShadowsocksR" "启动/重启 ShadowsocksR" "停止 ShadowsocksR" "查看 ShadowsocksR 日志" "修改 ShadowsocksR 配置" "查看 ShadowsocksR 信息" "更新 libsodium" "检查更新")
-    local function=("install_shadowsocksr" "uninstall_shadowsocksr" "start_shadowsocksr" "stop_shadowsocksr" "viewlog_shadowsocksr" "set_config_shadowsocksr_main" "viewinfo_shadowsocksr" "install_libsodium" "echo 检查更新")
-    echo -e "    \033[32m ShadowsocksR Server 管理脚本 (单用户) v1 \033[0m"
+    local function=("install_shadowsocksr" "uninstall_shadowsocksr" "start_shadowsocksr" "stop_shadowsocksr" "viewlog_shadowsocksr" "set_config_shadowsocksr_main" "viewinfo_shadowsocksr" "install_libsodium" "update")
+    echo -e "    \033[32m ShadowsocksR Server 管理脚本 (单用户) v$ver \033[0m"
     echo -e "       \033[32m            By: Hill \033[0m"
     echo -e "      \033[32m     Form: https://goo.gl/hLwm4B \033[0m"
     echo
@@ -90,6 +94,9 @@ main_i() {
 
 # 变量声明
 variable() {
+    ver=1
+    update_info="shadowsocksr-shell-manage"
+    update_url="https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/update.json"
     cpu_number=`cat /proc/cpuinfo | grep -c processor`
     libsodium_git="https://github.com/jedisct1/libsodium.git"
     libsodium_branch="stable"
@@ -219,7 +226,8 @@ uninstall_shadowsocksr() {
 
 # 检查 ShadowsocksR 是否运行
 is_run_shadowsocksr() {
-    if [ -f $ssr_pid_file ]; then
+    local pid=`cat $ssr_pid_file`
+    if [ -d "/proc/$pid" ]; then
         return 1
     else
         return 0
@@ -249,6 +257,7 @@ stop_shadowsocksr() {
     $ssr_exec_stop
 }
 
+# 添加和删除 iptables 规则
 iptables_shadowsocksr() {
     iptables -D INPUT -p tcp --dport $ssr_config_old_port -j ACCEPT
     iptables -D OUTPUT -p tcp --sport $ssr_config_old_port -j ACCEPT
@@ -274,7 +283,7 @@ set_config_shadowsocksr_main() {
     echo -e "       \033[32m 修改 ShadowsocksR 配置 \033[0m"
     echo
     local function_text=("端口" "密码" "加密方法" "协议插件" "协议插件参数" "混淆插件" "混淆插件参数" "单线程限速" "单用户限速" "日志模式" "自定义修改")
-    local function=("set_config_shadowsocksr_port" "set_config_shadowsocksr_passwd" "set_config_shadowsocksr_method" "set_config_shadowsocksr_protocol" "set_config_shadowsocksr_protocol_param" "set_config_shadowsocksr_obfs" "set_config_shadowsocksr_obfs_param" "set_config_shadowsocksr_speed_con" "set_config_shadowsocksr_speed_user" "set_config_shadowsocksr_log" "set_config_customize")
+    local function=("set_config_shadowsocksr_port" "set_config_shadowsocksr_passwd" "set_config_shadowsocksr_method" "set_config_shadowsocksr_protocol" "set_config_shadowsocksr_protocol_param" "set_config_shadowsocksr_obfs" "set_config_shadowsocksr_obfs_param" "set_config_shadowsocksr_speed_con" "set_config_shadowsocksr_speed_user" "set_config_shadowsocksr_log" "set_config_shadowsocksr_customize")
     for ((i=0;i<${#function_text[@]};i++))
     do
       echo -e "   \033[34m $(($i+1)): ${function_text[$i]} \033[0m"
@@ -298,6 +307,7 @@ set_config_shadowsocksr_main() {
     ${function[($num - 1)]}
 }
 
+# 更改 ShadowsocksR 配置文件
 set_config_shadowsocksr() {
     local json_line=`echo "$ssr_config" | grep -w "\"$1\"" `
     local comma
@@ -312,6 +322,7 @@ set_config_shadowsocksr() {
     [ $ssr_run_status -ne 0 ] && start_shadowsocksr
 }
 
+# 获取 ShadowsocksR 当前配置
 get_config_shadowsocksr_curr() {
     echo -e "\033[36m 当前配置: `jq .$1 $ssr_config_file`\033[0m"
     echo
@@ -615,7 +626,8 @@ set_config_shadowsocksr_log() {
     set_config_shadowsocksr connect_verbose_info $ssr_config_log_connect
 }
 
-set_config_customize() {
+# 自定义更改 ShadowsocksR 配置
+set_config_shadowsocksr_customize() {
     clear
     nano $ssr_config_file
     [ $ssr_run_status -ne 0 ] && start_shadowsocksr
@@ -639,6 +651,59 @@ viewinfo_shadowsocksr() {
     fi
     echo -e "\033[36m 日志输出连接信息:\033[0m \033[34m$connect_verbose_info \033[0m"
     echo
+}
+
+# 检查新版本并更新
+update() {
+    clear
+    echo "正在检查更新..."
+    local data=`curl -s -L $update_url`
+    clear
+    if [ $? -eq 0 ]; then
+        local info=`echo "$data" | jq -r .info`
+        if [ "$info" = "$update_info" ]; then
+            local version=`echo "$data" | jq .single_user_ver`
+            local local_md5="`md5sum $0 | awk '{print $1}'`"
+            local update_md5="`echo "$data" | jq -r .single_user_md5`"
+            if [ $ver -lt $version -o "$local_md5" != "$update_md5" ]; then
+                echo -e "检测到新版本: \033[31m$version\033[0m"
+                echo -e "本地版本: \033[31m$ver\033[0m"
+                echo
+                echo "MD5:"
+                echo "本地版本: $local_md5"
+                echo "最新版本: $update_md5"
+                echo
+                echo "更新日志: "
+                echo "$data" | jq -r .single_user_log
+                echo
+                read -p "是否更新 [Y/n]: " yn
+                [ "$yn" = "Y" -o "$yn" = "y" ] && {
+                    echo
+                    mkdir -p /tmp/$update_info
+                    local save_file="/tmp/$update_info/single-user.sh"
+                    curl -o $save_file  `echo "$data" | jq -r .single_user_url`
+                    if [ $? -eq 0 ]; then
+                        local md5=`md5sum $save_file | awk '{print $1}'`
+                        if [ "$md5" = "$update_md5" ]; then
+                            mv $save_file $0
+                            echo "更新完成"
+                        else
+                            echo "下载文件校验失败"
+                        fi
+
+                    else
+                        echo "更新文件下载失败"
+                    fi
+                }
+            else
+                echo "当前已是最新版"
+            fi
+        else
+            echo "获取版本信息失败"
+        fi
+    else
+        echo "获取版本信息失败"
+    fi
 }
 
 
