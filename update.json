@@ -1,7 +1,7 @@
 {
-    "single_user_ver": 1,
-    "single_user_log": "首个版本",
+    "single_user_ver": 2,
+    "single_user_log": "1. 添加开机启动\n2. 优化获取运行状态\n3. 规范代码\n4. 修复错误",
     "single_user_url": "https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/single-user.sh",
-    "single_user_md5": "fc0fcf07cb49868f3babb089185a3084",
+    "single_user_md5": "9030564378d7452986e5826c433c54a9",
     "info": "shadowsocksr-shell-manage"
 }
