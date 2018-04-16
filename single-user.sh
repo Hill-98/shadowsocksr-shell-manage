@@ -107,7 +107,7 @@ variable() {
     SSRS="ShadowsocksR Server"
     name="single-user"
     _name="single_user"
-    ver=2
+    ver=3
     update_info="shadowsocksr-shell-manage"
     update_url="https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/update.json"
     cpu_number=`cat /proc/cpuinfo | grep -c processor`
@@ -261,7 +261,7 @@ start_shadowsocksr() {
     [ $ssr_run_status -ne 0 ] && stop_shadowsocksr
     ulimit -n 512000
     $ssr_exec_start
-    iptables_shadowsocksr A
+    iptables_shadowsocksr I
     if [ "$1" != "boot" ]; then
         viewinfo_shadowsocksr
     fi
@@ -328,12 +328,12 @@ iptables_shadowsocksr() {
         iptables -D INPUT -p udp --dport $ssr_config_old_port -j ACCEPT
         iptables -D OUTPUT -p udp --sport $ssr_config_old_port -j ACCEPT
     }
-    [ "$1" = "A" ] && {
+    [ "$1" = "I" ] && {
         local port=`jq .server_port $ssr_config_file`
-        iptables -A INPUT -p tcp --dport $port -j ACCEPT
-        iptables -A OUTPUT -p tcp --sport $port -j ACCEPT
-        iptables -A INPUT -p udp --dport $port -j ACCEPT
-        iptables -A OUTPUT -p udp --sport $port -j ACCEPT
+        iptables -I INPUT -p tcp --dport $port -j ACCEPT
+        iptables -I OUTPUT -p tcp --sport $port -j ACCEPT
+        iptables -I INPUT -p udp --dport $port -j ACCEPT
+        iptables -I OUTPUT -p udp --sport $port -j ACCEPT
     }
 }
 

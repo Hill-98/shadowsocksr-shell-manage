@@ -1,7 +1,7 @@
 {
-    "single_user_ver": 2,
-    "single_user_log": "1. 添加开机启动\n2. 优化获取运行状态\n3. 规范代码\n4. 修复错误",
+    "single_user_ver": 3,
+    "single_user_log": "1.优化 iptables 添加规则",
     "single_user_url": "https://raw.githubusercontent.com/Hill-98/shadowsocksr-shell-manage/master/single-user.sh",
-    "single_user_md5": "9030564378d7452986e5826c433c54a9",
+    "single_user_md5": "c4e44c4bf32c538a1eb991b11adbbaa4",
     "info": "shadowsocksr-shell-manage"
 }
